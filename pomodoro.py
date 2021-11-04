@@ -1,6 +1,6 @@
 from tkinter import *
 import math
-# ---------------------------- Globale Variablen ------------------------------- #
+# ---------------------------------------- Globale Variablen ---------------------------------------- #
 PINK = "#e2979c"                                        # Für kurze Pause
 RED = "#e7305b"                                         # Für lange Pause
 GREEN = "#9bdeac"                                       # Für Arbeitsphase
@@ -12,7 +12,7 @@ LONG_BREAK_MIN = 20                                     # 20-Minuten-Pause nach 
 reps = 0                                                # Counter der Wiederholungen
 timer = None                                            # Timer für Countdown
 
-# ---------------------------- TIMER Reset-Funktion ------------------------------- #
+# -------------------------------------- Timer-Reset-Funktion ---------------------------------------- #
 
 
 def reset_timer():
@@ -24,49 +24,49 @@ def reset_timer():
     reps = 0
 
 
-# ---------------------------- TIMER Funktionsweise ------------------------------- #
+# ------------------------------------- Timer-Funktionsweise --------------------------------------- #
 
 def start_timer():
     global reps
     reps += 1
 
-    work_sec = WORK_MIN * 60
-    short_break_sec = SHORT_BREAK_MIN * 60
-    long_break_sec = LONG_BREAK_MIN * 60
+    work_sec = WORK_MIN * 60                            # Zeitspanne der Arbeitsphase
+    short_break_sec = SHORT_BREAK_MIN * 60              # Zeitspanne der kurzen Pause
+    long_break_sec = LONG_BREAK_MIN * 60                # Zeitspanne der langen Pause
 
-    if reps % 8 == 0:
-        count_down(long_break_sec)
-        title_label.config(text="Break", fg=RED)
-    elif reps % 2 == 0:
-        count_down(short_break_sec)
-        title_label.config(text="Break", fg=PINK)
+    if reps % 8 == 0:                                   # Anzahl Wiederholungen % 8, wenn True: Lange Pause
+        count_down(long_break_sec)                      # Aufruf Countdown-Fkt. mit Variablen der langen Pause
+        title_label.config(text="Break", fg=RED)        # Titellabel wechselt zu "Break"
+    elif reps % 2 == 0:                                 # Anzahl Wiederholungen % 2, wenn Treu: Kurze Pause
+        count_down(short_break_sec)                     # Aufruf Countdown-Fkt. mit Variablen der kurzen Pause
+        title_label.config(text="Break", fg=PINK)       # siehe Zeile 39
     else:
-        count_down(work_sec)
-        title_label.config(text="Work", fg=GREEN)
+        count_down(work_sec)                            # Aufruf Countdown-Fkt. mit Variablen der Arbeitsphase
+        title_label.config(text="Work", fg=GREEN)       # Titellabel wechselt zu "Work"
 
 
-# ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
+# ------------------------------------- Countdown-Funktionsweise --------------------------------------- #
 def count_down(count):
 
-    count_min = math.floor(count / 60)
+    count_min = math.floor(count / 60)                  # Minutenberechnung auf zwei Nachkommastellen
     count_sec = count % 60
     if count_sec < 10:
-        count_sec = f"0{count_sec}"
+        count_sec = f"0{count_sec}"                     # Dynamic Typing: int-Sekundenziffern werden durch str ersetzt
 
-    canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
-    if count > 0:
+    canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}") # Darstellung der Timer-Ziffern im Format 00:00
+    if count > 0:                                       # Wenn > 0
         global timer
-        timer = window.after(1000, count_down, count - 1)
+        timer = window.after(1000, count_down, count - 1) # Argumentenübergabe an count_down-Fkt. zwecks Herunterzählen
     else:
-        start_timer()
-        marks = ""
+        start_timer()                                    # Ansonsten start_timer-Fkt. ausführen
+        marks = ""                                       # Variable für Haken
         work_sessions = math.floor(reps/2)
         for _ in range(work_sessions):
             marks += "✔"
-        check_marks.config(text=marks)
+        check_marks.config(text=marks)                   # Setzen der Häckchen im check_marks-Feld
 
 
-# ---------------------------- UI SETUP ------------------------------- #
+# --------------------------------------------- UI-Aufbau ---------------------------------------------- #
 window = Tk()
 window.title("Pomodoro")
 window.config(padx=100, pady=50, bg=YELLOW)
@@ -75,7 +75,7 @@ window.config(padx=100, pady=50, bg=YELLOW)
 title_label = Label(text="Timer", fg=GREEN, bg=YELLOW, font=(FONT_NAME, 50))
 title_label.grid(column=1, row=0)
 
-canvas = Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
+canvas = Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)       # Verhindern eines ungewollten Rahmens
 tomato_img = PhotoImage(file="tomato.png")
 canvas.create_image(100, 112, image=tomato_img)
 timer_text = canvas.create_text(100, 130, text="00:00", fill="white", font=(FONT_NAME, 35, "bold"))
