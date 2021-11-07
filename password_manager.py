@@ -1,7 +1,10 @@
+import json
 from tkinter import *
 from tkinter import messagebox
 import random
 import pyperclip
+import json
+
 
 # ---------------------------- PASSWORD-GENERATOR ------------------------------- #
 
@@ -30,22 +33,53 @@ def generate_password():
 # ---------------------------- PASSWORT SPEICHERN ------------------------------- #
 
 def save():
-
-    website = website_entry.get()                                         # Einlesen der Daten aus Eingabefeldern
+    website = website_entry.get()
     email = email_entry.get()
     password = password_entry.get()
+    new_data = {
+      website: {
+        "email": email,
+        "password": password, 
+      }
+    }
 
     if len(website) == 0 or len(password) == 0:
-        messagebox.showinfo(title="Oops", message="Please don't leave any fields empty!")
+      messagebox.showinfo(title="Oops", message="Bitte keine Eingabefelder leer lassen.")
     else:
-        is_ok = messagebox.askokcancel(title="website", message=f"These are the details entered: \nEmail: {email} "
-                                 f"\nPassword: {password} \nIs it ok to save?")
+      try:
+        with open("data.json", "r") as data_file:
+          # Alte Daten einlesen
+          data = json.load(data_file)
+      except(FileNotFoundError, json.decoder.JSONDecodeError):
+        with open("data.json", "w") as data_file:
+          json.dump(new_data, data_file, indent=4)
+      else:
+        # Alte Daten mit neuen updaten
+        data.update(new_data)
 
-        if is_ok:
-            with open("data.txt", "a") as data_file:                    # data.txt wird geschrieben
-                data_file.write(f"{website} | {email} | {password}\n")  # Daten werden in data übergeben
-                website_entry.delete(0, END)                            # Eingaben aus den Feldern löschen
-                password_entry.delete(0, END)                           # Von Index 0 bis Ende
+        with open("data.json", "w") as data_file:
+          # Geupdatete Daten speichern
+          json.dump(data, data_file, indent=4)
+      finally:
+        website_entry.delete(0, END)
+        password_entry.delete(0, END)
+
+
+# ------------------------------------ PASSWORD FINDEN ----------------------------------------- #
+def find_password():
+    website = website_entry.get()
+    try:
+        with open("data.json") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showinfo(title="Error", message="Keine Daten gefunden.")
+    else:
+        if website in data:
+            email = data[website]["email"]
+            password = data[website]["password"]
+            messagebox.showinfo(title=website, message=f"Email: {email}\nPasswort: {password}")
+        else:
+            messagebox.showinfo(title="Error", message=f"Keine Daten für {website} gefunden.")
 
 
 # ---------------------------- UI-SETUP ------------------------------- #
@@ -54,43 +88,39 @@ white = "#ffffff"
 font_name = "Courier"
 
 window = Tk()
-window.title("Password Manager")
-window.config(padx=50, pady=50, bg=white)
+window.title("Passwort-Manager")
+window.config(padx=50, pady=50)
 
-canvas = Canvas(width=200, height=200, bg=white)
+canvas = Canvas(height=200, width=200)
 logo_img = PhotoImage(file="logo.png")
 canvas.create_image(100, 100, image=logo_img)
-canvas.grid(column=1, row=0, pady=20)
+canvas.grid(row=0, column=1)
 
-
-# Label
+# Labels
 website_label = Label(text="Webseite:")
-website_label.grid(column=0, row=1)
+website_label.grid(row=1, column=0)
 email_label = Label(text="Email/Username:")
-email_label.grid(column=0, row=2)
+email_label.grid(row=2, column=0)
 password_label = Label(text="Passwort:")
-password_label.grid(column=0, row=3)
+password_label.grid(row=3, column=0)
 
-# Eingaben
-
-website_entry = Entry(width=35)
-website_entry.grid(column=1, row=1, columnspan=2)
+# Eingabefelder
+website_entry = Entry(width=21)
+website_entry.grid(row=1, column=1)
 website_entry.focus()
-
-email_entry = Entry(width=35,)
-email_entry.grid(column=1, row=2, columnspan=2)
+email_entry = Entry(width=35)
+email_entry.grid(row=2, column=1, columnspan=2)
 email_entry.insert(0, "appris@gmx.net")
-
-password_entry = Entry(width=16)
-password_entry.grid(column=1, row=3)
+password_entry = Entry(width=21)
+password_entry.grid(row=3, column=1)
 
 # Buttons
-
-add_button = Button(text="Add", width=32, command=save)         # Save-Funktionsaufruf nach Click auf Button
-add_button.grid(column=1, row=4, columnspan=2)
-generate_button = Button(text="Password", width=10, command=generate_password)
-generate_button.grid(column=2, row=3)
-
+search_button = Button(text="Suchen", width=13, command=find_password)
+search_button.grid(row=1, column=2)
+generate_password_button = Button(text="Passwort generieren", command=generate_password)
+generate_password_button.grid(row=3, column=2)
+add_button = Button(text="Hinzufügen", width=36, command=save)
+add_button.grid(row=4, column=1, columnspan=2)
 
 
 window.mainloop()
