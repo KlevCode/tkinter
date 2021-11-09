@@ -1,4 +1,3 @@
-import json
 from tkinter import *
 from tkinter import messagebox
 import random
@@ -6,7 +5,7 @@ import pyperclip
 import json
 
 
-# ---------------------------- PASSWORD-GENERATOR ------------------------------- #
+# ---------------------------- PASSWORT-GENERATOR ------------------------------- #
 
 def generate_password():
 
@@ -39,7 +38,7 @@ def save():
     new_data = {
       website: {
         "email": email,
-        "password": password, 
+        "password": password,
       }
     }
 
