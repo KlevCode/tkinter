@@ -1,24 +1,22 @@
 import tkinter as tk
-import PyPDF2
 from PIL import Image, ImageTk
-from tkinter.filedialog import askopenfile
 
 root = tk.Tk()
 
-root.title("PDF-Textripper")
+root.title("Pomodoro-Timer")
 
 canvas = tk.Canvas(root, width=600, height=300)
 canvas.grid(columnspan=3, rowspan=3)
 
 # Einfügen des Logos
-logo = Image.open('/home/hauke/Dokumente/Code/Python/tkinter/large.png')
+logo = Image.open('./large.png')
 logo = ImageTk.PhotoImage(logo)
 logo_label = tk.Label(image=logo)
 logo_label.image = logo
 logo_label.grid(column=1, row=0)
 
 # Anweisung, pdf-Datei auszuwählen
-instructions = tk.Label(root, text="PDF-Datei auswählen, um Text zu extrahieren", font="Raleway")
+instructions = tk.Label(root, text="Button klicken um 25-Minuten-Timer zu starten", font="Raleway")
 instructions.grid(columnspan=3, column=0, row=1)
 
 # Funktion zur Auswahl der Datei über den Button
